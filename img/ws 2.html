@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    本人: <input type="text" id="id"><br>
+    对方: <input type="text" id="id1"><br>
+    发送：<input type="text" id="input"><br>
+    <button id="button">发送</button>
+    <span id="span"></span>
+    <script>
+
+        const button = document.getElementById('button')
+        const id = document.getElementById('id')
+        const id1 = document.getElementById('id1')
+
+        id.value = '2'
+
+        const obj = {
+            value: '',
+            id: id.value || '',
+            id1: id1.value || ''
+        }
+        let socket = new WebSocket('ws://localhost:9000/ws'); 
+        socket.addEventListener('open', (event) => {
+            socket.send(JSON.stringify({
+            value: '建立本人连接',
+            id: id.value || '',
+            id1: id1.value || ''
+        }));
+
+        });
+
+        socket.addEventListener('message', (event) => {
+            console.log(`Received message: ${event.data}`);
+            const span = document.getElementById('span')
+            span.innerHTML = event.data
+            // 处理接收到的消息
+        });
+        id.addEventListener('change', (e) => {
+            console.log(e)
+            
+            obj.id = e.target.value || '1'
+            socket.send(JSON.stringify(obj));
+        })
+        id1.addEventListener('change', (e) => {
+            console.log(e)
+            
+            obj.id1 = e.target.value || '1'
+            socket.send(JSON.stringify(obj));
+        })
+        
+        button.addEventListener('click', () => {
+            const input = document.getElementById('input')
+            obj.value = input.value
+            socket.send(JSON.stringify(obj));
+        })
+    </script>
+</body>
+
+</html>
